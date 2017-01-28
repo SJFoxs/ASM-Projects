@@ -8,6 +8,7 @@ TITLE Fibonacci Num Generator     (Project02.asm)
 INCLUDE Irvine32.inc
 
 UPPERLIM EQU 46
+MAXTERM EQU 5
 
 ; (insert constant definitions here)
 
@@ -18,6 +19,12 @@ termvar DWORD ?
 chkdata BYTE "Currently checking input....", 0
 invalidterm BYTE "This is an invalid term, please try again.", 0
 validterm BYTE "This is a valid term, continuing.", 0
+curvar DWORD 1
+prevar DWORD 0
+nextvar DWORD ?
+loopvar DWORD ?
+segvar DWORD ?
+breakterm BYTE "     ", 0
 
 ; (insert variable definitions here)
 
@@ -52,10 +59,48 @@ mov edx, OFFSET invalidterm
 call WriteString
 jmp __termchk
 
+;Valid term, continue
 __msg2:
-mov edx, OFFSET Validterm
+mov edx, OFFSET validterm
 call WriteString
 call CrLf
+
+mov eax, termvar
+mov edx, 0
+div MAXTERM
+mov loopvar, eax
+mov segvar, edx
+
+;mov ecx, loopvar 
+
+__part1:
+cmp ecx, 0
+je __part2
+dec loopvar
+jmp __calc
+
+;Calculate terms F_n = F_n-1 + F_n-2
+__calc:
+mov eax, curvar
+call WriteDec
+call CrLf
+mov eax, curvar
+add eax, prevar
+mov nextvar, eax
+mov eax, curvar
+mov prevar, eax
+mov eax, nextvar
+mov curvar, eax
+jmp __part2
+
+__part2:
+loop __part1
+mov edx, OFFSET breakterm
+call WriteString
+call CrLf
+
+;cmp curvar, UPPERLIM
+;jle __calc
 
 ; (insert executable instructions here)
 
