@@ -22,6 +22,15 @@ usernum DWORD ?
 checkvar DWORD 0 ;0 is false and 1 is true
 errormsg BYTE "Out of range. Try again.", 0
 
+;showComposites var
+linecount DWORD ?
+looprem DWORD ?
+linemax DWORD 10
+spacing BYTE "   ", 0
+temp_var DWORD 4
+primearray DWORD 2, 3, 5, 7, 11, 13, 17, 19, 23, 29
+arraycount DWORD ?
+
 ;Farewell Var
 outro_msg BYTE "Results certified by Sergio Ortega-Rojas", 0
 
@@ -32,7 +41,7 @@ main PROC
 
 call introduction
 call getUserData
-;call showComposites
+call showComposites
 ; (insert executable instructions here)
 call farewell
 
@@ -118,6 +127,36 @@ validate ENDP
 ;Registers Changed:
 showComposites PROC
 
+mov eax, usernum
+cdq
+div linemax ; 10
+mov linecount, eax ;counts number of lines
+mov looprem, edx ;counts of items in last line
+
+__method1:
+cmp linecount, 0
+je __method2
+dec linecount
+mov ecx, 10
+
+__primaryloop:
+call isComposite
+loop __primaryloop
+call CrLf
+
+jmp __method1
+
+__method2:
+cmp looprem, 0
+je __exit
+mov ecx, looprem
+
+__secondaryloop:
+call isComposite
+loop __secondaryloop
+
+__exit:
+call CrLf
 
 ret
 showComposites ENDP
@@ -128,11 +167,39 @@ showComposites ENDP
 ;Returns:
 ;Preconditions:
 ;Registers Changed:
-isComposites PROC
+isComposite PROC
 
+mov esi, OFFSET primearray
+mov ebx, 0
+mov arraycount, ebx
 
+__checkloop:
+mov ebx, [esi]
+mov eax, temp_var
+cdq
+div ebx
+cmp edx, 0
+je __isTrue
+cmp arraycount, 9
+je __isFalse
+add esi, 4
+inc arraycount
+jmp __checkloop
+
+__isTrue:
+mov eax, temp_var
+call WriteDec
+mov edx, OFFSET spacing
+call WriteString
+inc temp_var
+jmp __exit
+
+__isFalse:
+inc temp_var
+
+__exit:
 ret
-isComposites ENDP
+isComposite ENDP
 
 
 ;Descriptions: 
