@@ -54,7 +54,10 @@ repeat_msg BYTE "Another problem? (y/n): ", 0
 invalid_msg BYTE "Invalid Response.", 0
 repeatAnswer BYTE 20 DUP(0)
 repeatAnswer_offset DWORD ?
-repeatTF DWORD ?
+repeatTF DWORD 0
+
+;main Variables
+exit_msg BYTE "OK .... Goodbye!", 0
 
 .code
 main PROC
@@ -63,7 +66,7 @@ call Randomize
 ;Introduction
 call Introduction
 
-__problem_set:
+__repeat_set:
 ;showProblem
 push OFFSET n_var
 push OFFSET r_var
@@ -97,10 +100,22 @@ push OFFSET repeatAnswer_offset
 call checkRepeat
 
 ; (insert executable instructions here)
+cmp repeatTF, 1
+je __repeat_set
+
+displayString exit_msg
+call CrLf
 
 	exit	; exit to operating system
 main ENDP
 
+
+
+;Descriptions: 
+;Receives: 
+;Returns: 
+;Preconditions: 
+;Registers Changed: 
 Introduction PROC
 
 displayString title_msg
@@ -181,14 +196,16 @@ push ebp
 mov ebp, esp
 
 displayString prompt_msg
-;mov edx, [ebp + 16]
-;mov ecx, [ebp + 12]
-;call ReadString
-;mov ebx, [ebp + 8]
-;mov [ebx], eax
-mov ebx, [ebp + 20]
-call ReadInt
+mov edx, [ebp + 16]
+mov ecx, [ebp + 12]
+call ReadString
+mov ebx, [ebp + 8]
 mov [ebx], eax
+
+mov esi, [ebp + 16]
+;mov ebx, [ebp + 20]
+;call ReadInt
+;mov [ebx], eax
 
 
 
